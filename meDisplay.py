@@ -20,16 +20,16 @@ port = 65532
 ffmpeg = 'ffmpeg'
 
 # 默认编码器，可选：mjpg vp8 h264 hevc
-encoder = 'mjpg'
+encoder = 'vp8'
 
 # 帧率
-frameRate = '60'
+frameRate = '12'
 
 # 质量 1质量最好 默认是7
 mjpgQuality = '7'
 
 # 其他模式下的码率
-mp4Bitrate = '10M'
+mp4Bitrate = '3M'
 
 # 最大分辨率限制(横边)，超过自动缩小
 maxX = '1920'
@@ -106,7 +106,7 @@ class meHandler(BaseHTTPRequestHandler):
         self.send_header("Cache-Control", 'no-cache')
         self.end_headers()
         # 更多参数 ffmpeg -h demuxer=avfoundation
-        ffmpegArgs = [ffmpeg, '-f', 'avfoundation', '-capture_cursor', 'true', '-framerate', frameRate, '-i', display]
+        ffmpegArgs = [ffmpeg, '-f', 'avfoundation', '-capture_cursor', 'true', '-framerate', frameRate, '-i', display, '-bufsize', '1M']
         if ost == 2:
             ffmpegArgs = [ffmpeg, '-f', 'gdigrab', '-framerate', frameRate, '-i', 'desktop']
         elif ost == 3:
@@ -117,7 +117,7 @@ class meHandler(BaseHTTPRequestHandler):
             # -video_size 可以指定分辨率
             pipe = subprocess.Popen(ffmpegArgs + ['-c', 'mjpeg', '-f', 'mpjpeg', '-q', mjpgQuality, '-'], stdout=subprocess.PIPE, bufsize=10 ** 5)
         elif enc == 'vp8':
-            pipe = subprocess.Popen(ffmpegArgs + ['-c', 'libvpx', '-speed', '8', '-b:v', mp4Bitrate, '-f', 'webm', '-'], stdout=subprocess.PIPE, bufsize=10 ** 5)
+            pipe = subprocess.Popen(ffmpegArgs + ['-c', 'libvpx', '-deadline', 'realtime', '-cpu-used', '2', '-row-mt', '1', '-b:v', mp4Bitrate, '-f', 'webm', '-'], stdout=subprocess.PIPE, bufsize=10 ** 5)
         else:
             c = enc + '_videotoolbox'
             if ost != 1:
