@@ -106,7 +106,7 @@ class meHandler(BaseHTTPRequestHandler):
         self.send_header("Cache-Control", 'no-cache')
         self.end_headers()
         # 更多参数 ffmpeg -h demuxer=avfoundation
-        ffmpegArgs = [ffmpeg, '-f', 'avfoundation', '-capture_cursor', 'true', '-framerate', frameRate, '-i', display, '-bufsize', '1M']
+        ffmpegArgs = [ffmpeg, '-f', 'avfoundation', '-capture_cursor', 'true', '-framerate', frameRate, '-i', display]
         if ost == 2:
             ffmpegArgs = [ffmpeg, '-f', 'gdigrab', '-framerate', frameRate, '-i', 'desktop']
         elif ost == 3:
@@ -117,7 +117,7 @@ class meHandler(BaseHTTPRequestHandler):
             # -video_size 可以指定分辨率
             pipe = subprocess.Popen(ffmpegArgs + ['-c', 'mjpeg', '-f', 'mpjpeg', '-q', mjpgQuality, '-'], stdout=subprocess.PIPE, bufsize=10 ** 5)
         elif enc == 'vp8':
-            pipe = subprocess.Popen(ffmpegArgs + ['-c', 'libvpx', '-deadline', 'realtime', '-cpu-used', '2', '-row-mt', '1', '-b:v', mp4Bitrate, '-f', 'webm', '-'], stdout=subprocess.PIPE, bufsize=10 ** 5)
+            pipe = subprocess.Popen(ffmpegArgs + ['-c', 'libvpx', '-cpu-used', '2', '-row-mt', '1', '-b:v', mp4Bitrate, '-f', 'webm', '-'], stdout=subprocess.PIPE, bufsize=10 ** 5)
         else:
             c = enc + '_videotoolbox'
             if ost != 1:
@@ -277,3 +277,4 @@ elif ost == 1 and 'avfoundation' not in t:
     print('你安装的ffmpeg不支持avfoundation，无法进行屏幕采集，请查看文档：\n' + t)
 else:
     HTTPServer(("", port), meHandler).serve_forever()
+
