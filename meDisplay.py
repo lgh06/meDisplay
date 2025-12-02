@@ -23,13 +23,13 @@ ffmpeg = 'ffmpeg'
 encoder = 'vp8'
 
 # 帧率
-frameRate = '12'
+frameRate = '24'
 
 # 质量 1质量最好 默认是7
 mjpgQuality = '7'
 
 # 其他模式下的码率
-mp4Bitrate = '3M'
+mp4Bitrate = '4M'
 
 # 最大分辨率限制(横边)，超过自动缩小
 maxX = '1920'
@@ -106,12 +106,12 @@ class meHandler(BaseHTTPRequestHandler):
         self.send_header("Cache-Control", 'no-cache')
         self.end_headers()
         # 更多参数 ffmpeg -h demuxer=avfoundation
-        ffmpegArgs = [ffmpeg, '-f', 'avfoundation', '-capture_cursor', 'true', '-framerate', frameRate, '-i', display]
+        ffmpegArgs = [ffmpeg, '-f', 'avfoundation', '-capture_cursor', 'true', '-framerate', frameRate, '-i', display, '-bufsize','240K']
         if ost == 2:
             ffmpegArgs = [ffmpeg, '-f', 'gdigrab', '-framerate', frameRate, '-i', 'desktop']
         elif ost == 3:
             ffmpegArgs = [ffmpeg, '-f', 'x11grab', '-framerate', frameRate, '-i', ':0.0']
-        ffmpegArgs += ['-r', frameRate, '-vf', "scale='if(gt(iw\\,{}),{},iw)':'if(gt(iw\\,{}),-1,ih)'".format(maxX, maxX, maxX), '-preset', 'ultrafast', '-deadline', 'realtime', '-fflags', 'nobuffer']
+        ffmpegArgs += ['-r', frameRate, '-vf', "scale='if(gt(iw\\,{}),{},iw)':'if(gt(iw\\,{}),-1,ih)'".format(maxX, maxX, maxX), '-preset', 'ultrafast', '-deadline', 'realtime']
 
         if enc == 'mjpg':
             # -video_size 可以指定分辨率
@@ -277,4 +277,3 @@ elif ost == 1 and 'avfoundation' not in t:
     print('你安装的ffmpeg不支持avfoundation，无法进行屏幕采集，请查看文档：\n' + t)
 else:
     HTTPServer(("", port), meHandler).serve_forever()
-
