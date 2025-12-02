@@ -106,7 +106,7 @@ class meHandler(BaseHTTPRequestHandler):
         self.send_header("Cache-Control", 'no-cache')
         self.end_headers()
         # 更多参数 ffmpeg -h demuxer=avfoundation
-        ffmpegArgs = [ffmpeg, '-f', 'avfoundation', '-capture_cursor', 'true', '-framerate', frameRate, '-i', display, '-bufsize','240K']
+        ffmpegArgs = [ffmpeg, '-f', 'avfoundation', '-capture_cursor', 'true', '-framerate', frameRate, '-i', display, '-bufsize','320K']
         if ost == 2:
             ffmpegArgs = [ffmpeg, '-f', 'gdigrab', '-framerate', frameRate, '-i', 'desktop']
         elif ost == 3:
@@ -277,3 +277,4 @@ elif ost == 1 and 'avfoundation' not in t:
     print('你安装的ffmpeg不支持avfoundation，无法进行屏幕采集，请查看文档：\n' + t)
 else:
     HTTPServer(("", port), meHandler).serve_forever()
+
